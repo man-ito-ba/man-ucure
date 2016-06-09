@@ -1,4 +1,4 @@
-//Déclaration
+/*Déclaration version avec capteur sensitif*/
 //Déclaration des broches de Leds
 int LedRouge=2;
 int LedVerte=3;
