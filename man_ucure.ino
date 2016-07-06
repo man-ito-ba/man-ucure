@@ -24,6 +24,8 @@ void setup()
 		LCD.clear();
 	pinMode(Selecteur_Durees, INPUT);	// les deux pins des boutons en entrée
 	pinMode(Start_Button, INPUT);
+	pinMode(Led, OUTPUT);
+	digitalWrite(Led, LOW);
 	Etat_Selecteur, Etat_Start, Duree = 0;
 }
 
@@ -32,12 +34,12 @@ void loop()
 	Etat_Selecteur = digitalRead(Selecteur_Durees);
 	if(Etat_Selecteur)					// si le bouton de sélection de durée est appuyé, on rajoute 30 secondes de chauffe
 	{
-	    Duree = Duree + 30;
-	    if(Duree > 90)
-	    {
-	        Duree = 0;					// on revient à 0 si on appuie plus de 3 fois
-	    }
-	    Affichage(Duree);				// appel de la fonction d'affichage du temps sélectionné
+		Duree = Duree + 30;
+		if(Duree > 90)
+		{
+			Duree = 0;					// on revient à 0 si on appuie plus de 3 fois
+		}
+		Affichage(Duree);				// appel de la fonction d'affichage du temps sélectionné
 		Etat_Selecteur = 0;
 	}
 
@@ -45,10 +47,16 @@ void loop()
 	if(Etat_Start)						// si le bouton start est sélectionné
 	{
 		digitalWrite(Led, HIGH);		// on allume les Leds
-	    Decompte(Duree);				// on lance le compte à rebour sur le LCD
-	    digitalWrite(Led, LOW);
-	    Duree = 0;
-	    Etat_Start = 0;
+		Decompte(Duree);				// on lance le compte à rebour sur le LCD
+		digitalWrite(Led, LOW);
+			delay(Sec/5);
+			LCD.print("Fin !");
+			LCD.setCursor(0,1);
+			LCD.print(":)");
+			delay(2*Sec);
+			LCD.clear();
+		Duree = 0;
+		Etat_Start = 0;
 	}
 	delay(10);
 }
@@ -105,11 +113,5 @@ void Decompte(int Duree)
 		delay(Sec);
 		LCD.clear();
 	}
-	delay(Sec/2);
-	LCD.print("Fin !");
-	LCD.setCursor(0,1);
-	LCD.print(":)");
-    delay(2*Sec);
-    LCD.clear();
 	return;
 }
