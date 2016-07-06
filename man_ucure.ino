@@ -1,91 +1,117 @@
-/*Déclarations*/
-	//Déclaration de la broche contrôlant les Leds
-	int Led=13;
-	//Déclaration des broches de Switchs
-	int Switchs[]={8,9,10};
-	//Déclaration de la broche du bouton de lancement de séquence
-	int BoutonAllumage=5;
-	//Variables
-		int EtatSwitch[3]; //État des switchs (ce sera 1 ou 0)
-		int EtatBouton; //État du bouton (ce sera 1 ou 0)
-	//Variables pratiques
-		int Sec=1000; 
-		//pour utiliser des "secondes" quand je dois utiliser des temps
+// le document 123D.circuits.io : https://circuits.io/circuits/2409875
+
+#include <LiquidCrystal.h>				// bibliothèque de contrôle de l'écran LCD
+
+const int Sec = 1000;
+
+int Led = 13;							// Leds de cramage des ongles
+int Selecteur_Durees = 8;				// Bouton utilisateur : programmer la durée de grillage des ongles
+bool Etat_Selecteur;
+int Duree;								// Variable de durée contrôlant le temps d'allumage des Leds
+int Start_Button = 9;					// Bouton utilisateur :	lancer le grille-pain 
+bool Etat_Start;
+
+LiquidCrystal LCD(12,11,5,4,3,2);		// pins connectés au LCD
 
 void setup()
 {
-	//initialisation des Leds : broches en sortie et 0V
+	LCD.begin(16,2);					// initialisation de la communication avec 16 colonnes et 2 lignes
+		LCD.clear();					// on efface l'écran
+		LCD.print("Orteils  2.0  :)");
+		LCD.setCursor(0,1);				// on met le curseur sur la deuxième ligne à gauche
+		LCD.print("----------------");
+		delay(1*Sec);
+		LCD.clear();
+	pinMode(Selecteur_Durees, INPUT);	// les deux pins des boutons en entrée
+	pinMode(Start_Button, INPUT);
 	pinMode(Led, OUTPUT);
+	digitalWrite(Led, LOW);
+	Etat_Selecteur, Etat_Start, Duree = 0;
+}
+
+void loop()
+{
+	Etat_Selecteur = digitalRead(Selecteur_Durees);
+	if(Etat_Selecteur)					// si le bouton de sélection de durée est appuyé, on rajoute 30 secondes de chauffe
+	{
+		Duree = Duree + 30;
+		if(Duree > 90)
+		{
+			Duree = 0;					// on revient à 0 si on appuie plus de 3 fois
+		}
+		Affichage(Duree);				// appel de la fonction d'affichage du temps sélectionné
+		Etat_Selecteur = 0;
+	}
+
+	Etat_Start = digitalRead(Start_Button);
+	if(Etat_Start)						// si le bouton start est sélectionné
+	{
+		digitalWrite(Led, HIGH);		// on allume les Leds
+		Decompte(Duree);				// on lance le compte à rebour sur le LCD
 		digitalWrite(Led, LOW);
-	//initialisation des Switchs
-	for(int i=0; i<3; i++){
-		pinMode(Switchs[i], INPUT);
-		EtatSwitch[i]=0;
+			delay(Sec/5);
+			LCD.print("Fin !");
+			LCD.setCursor(0,1);
+			LCD.print(":)");
+			delay(2*Sec);
+			LCD.clear();
+		Duree = 0;
+		Etat_Start = 0;
 	}
-	//initialisation des variables
-	EtatBouton=0;
-	//communication Port Série
-	Serial.begin(9600);
-	Serial.println("Start");
+	delay(10);
 }
 
-void loop()
-{
-	for(int i=0; i<3; i++){
-	    EtatSwitch[i]=digitalRead(Switchs[i]);
-	}
-	EtatBouton=digitalRead(BoutonAllumage);
-	if(EtatBouton){
-	    if(EtatSwitch[0]){
-	        digitalWrite(Led, HIGH);
-	        delay(3*Sec);
-	    	digitalWrite(Led, LOW);
-	    }
-	    else if(EtatSwitch[1]){
-	        digitalWrite(Led, HIGH);
-	        delay(6*Sec);
-	    	digitalWrite(Led, LOW);
-	    }
-	    else if(EtatSwitch[2]){
-	        digitalWrite(Led, HIGH);
-	        delay(9*Sec);
-	    	digitalWrite(Led, LOW);
-	    }
-	}
+void Affichage(int Duree)
+{										// fonction d'affichage des durées sélectionnées
+	LCD.print("Duree : ");
+	LCD.setCursor(11,1);				// on place le curseur sur la première ligne tout à droite
+	LCD.print(Duree);
+	LCD.setCursor(14,1);
+	LCD.print("s.");
+	delay(1.5*Sec);
+	LCD.clear();
 }
-/*
-- je mets 3 au lieu de 30 pour pas poireauter alors que je ne fais que tester le programme
-- pour l'instant, je ne me suis pas occuper de savoir ce qui se passerait si plusieurs switchs sont mis en position haute en même temps
-Ça signifie que c'est toujours la valeur du switch le plus faible qui est pris en compte pour la durée d'allumage
-*/
 
-//En dessous, je te mets des variantes de code possibles
-/*
-//Ici, le code fait que les durées s'ajoutent. Donc on pourrait proposer "30 sec" par switch allumés.
-//Si les utilisateurs en activent deux, ben ça donne 30+30 sec par ex. 
-//Ici je te montre l'exemple avec des durées de 3 secondes.
-void loop()
-{
-	for(int i=0; i<3; i++){
-	    EtatSwitch[i]=digitalRead(Switchs[i]);
+void Decompte(int Duree)				
+{										// fonction de compte à rebour
+	for(int i=Duree; i > 0; i--){		// compte à rebour avec la fonction de temporisation
+		LCD.print("Temps");
+		LCD.setCursor(0,1);
+		LCD.print("restant :");
+		LCD.setCursor(11,1);
+		LCD.print(i,DEC);
+		LCD.setCursor(14,1);
+		LCD.print("s.");
+/*		// Animation : il suffit de virer tout cette partie :D
+			if( (i % 2) == 0 )
+			{
+				LCD.setCursor(2,1);
+				LCD.print("(");
+				LCD.setCursor(6,1);
+				LCD.print(")");
+				LCD.setCursor(3,0);
+				LCD.print("^");
+				LCD.setCursor(5,0);
+				LCD.print("^");
+				LCD.setCursor(4,1);
+				LCD.print("-");
+			}
+			if( (i % 2) != 0)
+			{
+				LCD.setCursor(2,1);
+				LCD.print("(");
+				LCD.setCursor(6,1);
+				LCD.print(")");
+				LCD.setCursor(3,0);
+				LCD.print("^");
+				LCD.setCursor(5,0);
+				LCD.print("^");
+				LCD.setCursor(4,1);
+				LCD.print("O");
+			}
+			// Fin Animation*/
+		delay(Sec);
+		LCD.clear();
 	}
-	EtatBouton=digitalRead(BoutonAllumage);
-	if(EtatBouton){
-	    if(EtatSwitch[0]){
-	        digitalWrite(Led, HIGH);
-	        delay(3*Sec);
-	    	digitalWrite(Led, LOW);
-	    }
-	    else if(EtatSwitch[1]){
-	        digitalWrite(Led, HIGH);
-	        delay(3*Sec);
-	    	digitalWrite(Led, LOW);
-	    }
-	    else if(EtatSwitch[2]){
-	        digitalWrite(Led, HIGH);
-	        delay(3*Sec);
-	    	digitalWrite(Led, LOW);
-	    }
-	}
+	return;
 }
-*/
