@@ -12,7 +12,7 @@ int Duree;								// Variable de durée contrôlant le temps d'allumage des Leds
 int Start_Button = 9;					// Bouton utilisateur :	lancer le grille-pain 
 bool Etat_Start;						// Variable d'état du bouton start
 
-LiquidCrystal LCD(12,11,5,4,3,2);		// pins connectés au LCD
+LiquidCrystal LCD(7,6,5,4,3,2);		// pins connectés au LCD
 
 void setup()
 {
