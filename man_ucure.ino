@@ -1,15 +1,16 @@
-// le document 123D.circuits.io : https://circuits.io/circuits/2409875
+// Github : https://github.com/man-ito-ba/man-ucure
+// Projet 123D.circuits.io : https://circuits.io/circuits/2409875
 
 #include <LiquidCrystal.h>				// bibliothèque de contrôle de l'écran LCD
 
-const int Sec = 1000;
+const int Sec = 1000;					// variable pratique pour gérer les secondes
 
-int Led = 13;							// Leds de cramage des ongles
+int Led = 13;							// UI : Leds indiquant qu'on se fait cramer les ongles
 int Selecteur_Durees = 8;				// Bouton utilisateur : programmer la durée de grillage des ongles
-bool Etat_Selecteur;
+bool Etat_Selecteur;					// Variable d'état du sélecteur de durée
 int Duree;								// Variable de durée contrôlant le temps d'allumage des Leds
 int Start_Button = 9;					// Bouton utilisateur :	lancer le grille-pain 
-bool Etat_Start;
+bool Etat_Start;						// Variable d'état du bouton start
 
 LiquidCrystal LCD(12,11,5,4,3,2);		// pins connectés au LCD
 
@@ -22,8 +23,10 @@ void setup()
 		LCD.print("----------------");
 		delay(1*Sec);
 		LCD.clear();
+
 	pinMode(Selecteur_Durees, INPUT);	// les deux pins des boutons en entrée
 	pinMode(Start_Button, INPUT);
+
 	pinMode(Led, OUTPUT);
 	digitalWrite(Led, LOW);
 	Etat_Selecteur, Etat_Start, Duree = 0;
@@ -39,7 +42,7 @@ void loop()
 		{
 			Duree = 0;					// on revient à 0 si on appuie plus de 3 fois
 		}
-		Affichage(Duree);				// appel de la fonction d'affichage du temps sélectionné
+		Affichage(Duree);				// avec cette fonction, on affiche le temps sélectionné sur le LCD
 		Etat_Selecteur = 0;
 	}
 
@@ -82,34 +85,6 @@ void Decompte(int Duree)
 		LCD.print(i,DEC);
 		LCD.setCursor(14,1);
 		LCD.print("s.");
-/*		// Animation : il suffit de virer tout cette partie :D
-			if( (i % 2) == 0 )
-			{
-				LCD.setCursor(2,1);
-				LCD.print("(");
-				LCD.setCursor(6,1);
-				LCD.print(")");
-				LCD.setCursor(3,0);
-				LCD.print("^");
-				LCD.setCursor(5,0);
-				LCD.print("^");
-				LCD.setCursor(4,1);
-				LCD.print("-");
-			}
-			if( (i % 2) != 0)
-			{
-				LCD.setCursor(2,1);
-				LCD.print("(");
-				LCD.setCursor(6,1);
-				LCD.print(")");
-				LCD.setCursor(3,0);
-				LCD.print("^");
-				LCD.setCursor(5,0);
-				LCD.print("^");
-				LCD.setCursor(4,1);
-				LCD.print("O");
-			}
-			// Fin Animation*/
 		delay(Sec);
 		LCD.clear();
 	}
